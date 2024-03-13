@@ -162,8 +162,8 @@ const Modal: React.FC<ModalProps> = ({
                     flex-row 
                     items-center 
                     gap-4 
-                    w-full    
-                    border-neutral-700              "
+                    w-full
+                  "
                                 >
                                     {secondaryAction && secondaryActionLabel && (
                                         <Button
