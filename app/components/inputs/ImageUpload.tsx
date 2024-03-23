@@ -1,92 +1,80 @@
 'use client';
 
-import {
-    FieldErrors,
-    FieldValues,
-    UseFormRegister
-} from "react-hook-form";
-import { BiDollar } from "react-icons/bi";
+import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
+import { useCallback } from "react";
+import { TbPhotoPlus } from 'react-icons/tb'
 
-interface InputProps {
-    id: string;
-    label: string;
-    type?: string;
-    disabled?: boolean;
-    formatPrice?: boolean;
-    required?: boolean;
-    register: UseFormRegister<FieldValues>,
-    errors: FieldErrors
+declare global {
+    var cloudinary: any
 }
 
-const Input: React.FC<InputProps> = ({
-    id,
-    label,
-    type = "text",
-    disabled,
-    formatPrice,
-    register,
-    required,
-    errors,
+const uploadPreset = "cz68qx7e";
+
+interface ImageUploadProps {
+    onChange: (value: string) => void;
+    value: string;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({
+    onChange,
+    value
 }) => {
+    const handleUpload = useCallback((result: any) => {
+        onChange(result.info.secure_url);
+    }, [onChange]);
+
     return (
-        <div className="w-full relative">
-            {formatPrice && (
-                <BiDollar
-                    size={24}
-                    className="
-            text-neutral-700
-            absolute
-            top-5
-            left-2
-          "
-                />
-            )}
-            <input
-                id={id}
-                disabled={disabled}
-                {...register(id, { required })}
-                placeholder=" "
-                type={type}
-                className={`
-          peer
-          w-full
-          p-4
-          pt-6 
-          font-light 
-          bg-white 
-          border-2
-          rounded-md
-          outline-none
-          transition
-          disabled:opacity-70
-          disabled:cursor-not-allowed
-          ${formatPrice ? 'pl-9' : 'pl-4'}
-          ${errors[id] ? 'border-rose-500' : 'border-neutral-300'}
-          ${errors[id] ? 'focus:border-rose-500' : 'focus:border-black'}
-        `}
-            />
-            <label
-                className={`
-          absolute 
-          text-md
-          duration-150 
-          transform 
-          -translate-y-3 
-          top-5 
-          z-10 
-          origin-[0] 
-          ${formatPrice ? 'left-9' : 'left-4'}
-          peer-placeholder-shown:scale-100 
-          peer-placeholder-shown:translate-y-0 
-          peer-focus:scale-75
-          peer-focus:-translate-y-4
-          ${errors[id] ? 'text-rose-500' : 'text-zinc-400'}
-        `}
-            >
-                {label}
-            </label>
-        </div>
+        <CldUploadWidget
+            onUpload={handleUpload}
+            uploadPreset={uploadPreset}
+            options={{
+                maxFiles: 1
+            }}
+        >
+            {({ open }) => {
+                return (
+                    <div
+                        onClick={() => open?.()}
+                        className="
+              relative
+              cursor-pointer
+              hover:opacity-70
+              transition
+              border-dashed 
+              border-2 
+              p-20 
+              border-neutral-300
+              flex
+              flex-col
+              justify-center
+              items-center
+              gap-4
+              text-neutral-600
+            "
+                    >
+                        <TbPhotoPlus
+                            size={50}
+                        />
+                        <div className="font-semibold text-lg">
+                            Click to upload
+                        </div>
+                        {value && (
+                            <div className="
+              absolute inset-0 w-full h-full">
+                                <Image
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                    src={value}
+                                    alt="House"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )
+            }}
+        </CldUploadWidget>
     );
 }
 
-export default Input;
+export default ImageUpload;
